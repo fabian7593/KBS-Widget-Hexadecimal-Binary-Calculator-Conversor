@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--Android-->
+    <color name="colorPrimary">#2B2525</color>
+    <color name="colorPrimaryDark">#0B5728</color>
+    <color name="colorAccent">#4CA028</color>
+    <color name="colorWhite">#FFFFFF</color>
+
+
+
+    <color name="backColor">#2B2525</color>
+    <color name="colorDarkPrimary">#0B5728</color>
+    <color name="colorLightPrimary">#106E61</color>
+    <color name="colorBlack">#4CA028</color>
+    <color name="megalight">#3D9488</color>
+
+</resources>
