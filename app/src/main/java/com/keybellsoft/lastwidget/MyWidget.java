@@ -7,6 +7,8 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -19,15 +21,12 @@ import android.widget.TextView;
  */
 public class MyWidget extends AppWidgetProvider {
 
+    private static final String btn0 = "btn0";
+    private static final String btn1 = "btn1";
+    private static final String btnClear = "btnClear";
+    private static final String btnResult = "btnResult";
 
-    private Button btn0;
-    private Button btn1;
-    private Button btnClear;
-    private Button Convert;
-
-    private TextView EditTextNumbers;
-
-
+    private static String editTextNumbers = "";
 
     protected PendingIntent getPendingSelfIntent(Context context, String action) {
         Intent intent = new Intent(context, getClass());
@@ -40,131 +39,38 @@ public class MyWidget extends AppWidgetProvider {
         super.onReceive(context, intent);
 
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.my_widget);
-        //remoteViews.set(R.id.btnResult, "Set button text here");
+        AppWidgetManager widManager = (AppWidgetManager.getInstance(context));
 
+        if (btnResult.equals(intent.getAction())) {
+            remoteViews.setTextViewText(R.id.EditTextNumbers, convertToHexa(editTextNumbers));
 
-
-        if ("result".equals(intent.getAction())){
-            remoteViews.setTextViewText(R.id.EditTextNumbers, convertToHexa(EditTextNumbers.getText().toString()).toUpperCase());
-
-
-           /* if(!EditTextNumbers.getText().toString().equals(""))
-                EditTextNumbers.setText(convertToHexa(EditTextNumbers.getText().toString()).toUpperCase());*/
-        }else if ("btn0".equals(intent.getAction())) {
-            //EditTextNumbers.setText(EditTextNumbers.getText().toString() + "0");
-            remoteViews.setTextViewText(R.id.EditTextNumbers, convertToHexa(EditTextNumbers.getText().toString() + "0"));
+        } else if (btn0.equals(intent.getAction())) {
+            editTextNumbers = editTextNumbers + "0";
+            remoteViews.setTextViewText(R.id.EditTextNumbers, editTextNumbers);
+        } else if (btn1.equals(intent.getAction())) {
+            editTextNumbers = editTextNumbers + "1";
+            remoteViews.setTextViewText(R.id.EditTextNumbers, editTextNumbers);
+        } else if (btnClear.equals(intent.getAction())) {
+            editTextNumbers = "";
+            remoteViews.setTextViewText(R.id.EditTextNumbers, "");
         }
-        else if ("btn1".equals(intent.getAction())) {
-            //EditTextNumbers.setText(EditTextNumbers.getText().toString() + "2");
-            remoteViews.setTextViewText(R.id.EditTextNumbers, convertToHexa(EditTextNumbers.getText().toString() + "1"));
-        }
-        else if ("btnClear".equals(intent.getAction())) {
-            EditTextNumbers.setText("");
-            remoteViews.setTextViewText(R.id.EditTextNumbers, convertToHexa(""));
-        }
+        ComponentName thisWidget = new ComponentName(context, MyWidget.class);
+        widManager.updateAppWidget(widManager.getAppWidgetIds(thisWidget), remoteViews);
     }
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+        super.onUpdate(context, appWidgetManager, appWidgetIds);
 
-        //TODO utilice el view y utilice el activity context y los datos me daban null
-       // View view = new View(context);
-
+        // Get all ids
+        ComponentName thisWidget = new ComponentName(context, MyWidget.class);
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.my_widget);
-        //remoteViews.set(R.id.btnResult, "Set button text here");
-
-        remoteViews.setOnClickPendingIntent(R.id.btnResult,
-                getPendingSelfIntent(context, "result"));
-
-
-        remoteViews.setOnClickPendingIntent(R.id.btn0,
-                getPendingSelfIntent(context, "btn0"));
-
-        remoteViews.setOnClickPendingIntent(R.id.btn1,
-                getPendingSelfIntent(context, "btn1"));
-
-        remoteViews.setOnClickPendingIntent(R.id.btnClear,
-                getPendingSelfIntent(context, "btnClear"));
-
-
-
-        //todo conversion a context
-       // EditTextNumbers =  ((TextView)((Activity)
-        // context).findViewById(R.id.EditTextNumbers));
-
-        /*Convert =  ((Button)((Activity)
-                context).findViewById(R.id.btnResult));
-
-        Convert.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(!EditTextNumbers.getText().toString().equals(""))
-                    EditTextNumbers.setText(convertToHexa(EditTextNumbers.getText().toString()).toUpperCase());
-            }
-        });
-
-//todo tambien con find by id
-        //btn0 = (Button) view.findViewById(R.id.btn0);
-        btn0 =  ((Button)((Activity)
-                context).findViewById(R.id.btn0));
-        btn0.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EditTextNumbers.setText(EditTextNumbers.getText().toString() + "0");
-            }
-        });
-        //btn1 = (Button) view.findViewById(R.id.btn1);
-        btn1 =  ((Button)((Activity)
-                context).findViewById(R.id.btn1));
-        btn1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EditTextNumbers.setText(EditTextNumbers.getText().toString() + "1");
-            }
-        });
-       // btnClear = (Button) view.findViewById(R.id.btnClear);
-        btnClear =  ((Button)((Activity)
-                context).findViewById(R.id.btnClear));
-        btnClear.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EditTextNumbers.setText("");
-            }
-        });*/
-
-//        EditTextNumbers =  ((TextView)((Activity)
-               // context).findViewById(R.id.EditTextNumbers));
-       // EditTextNumbers = (TextView) view.findViewById(R.id.EditTextNumbers);
-
-        // There may be multiple widgets active, so update all of them
-        final int N = appWidgetIds.length;
-        for (int i = 0; i < N; i++) {
-            updateAppWidget(context, appWidgetManager, appWidgetIds[i]);
-        }
+        remoteViews.setOnClickPendingIntent(R.id.btnResult, getPendingSelfIntent(context, btnResult));
+        remoteViews.setOnClickPendingIntent(R.id.btn0, getPendingSelfIntent(context, btn0));
+        remoteViews.setOnClickPendingIntent(R.id.btn1, getPendingSelfIntent(context, btn1));
+        remoteViews.setOnClickPendingIntent(R.id.btnClear, getPendingSelfIntent(context, btnClear));
+        appWidgetManager.updateAppWidget(appWidgetManager.getAppWidgetIds(thisWidget), remoteViews);
     }
-
-    private View.OnClickListener onClickListener = new View.OnClickListener() {
-
-        @Override
-        public void onClick(final View v) {
-            switch(v.getId()){
-                case R.id.btn0:
-                    EditTextNumbers.setText(EditTextNumbers.getText().toString() + "0");
-                    break;
-                case R.id.btn1:
-                    EditTextNumbers.setText(EditTextNumbers.getText().toString() + "1");
-                    break;
-                case R.id.btnClear:
-                    EditTextNumbers.setText("");
-                    break;
-                case R.id.btnResult:
-                    EditTextNumbers.setText(convertToHexa(EditTextNumbers.getText().toString()).toUpperCase());
-                    break;
-            }
-
-        }
-    };
-
 
     public String convertToHexa(String result) {
         try {
@@ -174,18 +80,6 @@ public class MyWidget extends AppWidgetProvider {
         } catch (Exception io) {
             return "";
         }
-    }
-
-    static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
-                                int appWidgetId) {
-
-        //CharSequence widgetText = MyWidgetConfigureActivity.loadTitlePref(context, appWidgetId);
-        // Construct the RemoteViews object
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.my_widget);
-       // views.setTextViewText(R.id.appwidget_text, widgetText);
-
-        // Instruct the widget manager to update the widget
-        appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 }
 
